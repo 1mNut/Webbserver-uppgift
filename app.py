@@ -27,6 +27,7 @@ DB_CONFIG = {
 }
 
 
+
 def get_db_connection():
     """Get a database connection"""
     try:
@@ -35,20 +36,33 @@ def get_db_connection():
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
+    
+def login_required(f):
+    """Dekorator som kräver inloggning"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login_page'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def is_valid_user_data(data):
+    return data and 'username' in data
 
 @app.route('/')
+@login_required
 def home():
     return render_template('index.html')
 
-@app.route('/users', methods=['POST'])
-def create_user():
-    data = request.get_json(silent=True)
-    if not is_valid_user_data(data):
-        return jsonify({"error": "Missing or invalid required fields (username, email, password)"}), 422
+@app.route('/sign_up', methods=['GET'])
+def sign_up_page():
+    return render_template('sign_up.html')
 
-    username = data.get('username')
-    email = data.get('email')
-    password = data.get('password')
+@app.route('/sign_up', methods=['POST'])
+def create_user():
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
     hashed_password = generate_password_hash(password)
 
     connection = get_db_connection()
@@ -61,17 +75,9 @@ def create_user():
         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
         cursor.execute(sql, (username, email, hashed_password))
         connection.commit()
-        user_id = cursor.lastrowid
-
-        user = {
-            'id': user_id,
-            'username': username,
-            'email': email,
-            'password': hashed_password
-        }
-        return jsonify(user), 201
+        return redirect(url_for('login_page'))
     except Error as e:
-        print(f"Error executing insert: {e}")
+        flash(f"Error executing insert: {e}")
         return jsonify({"error": "Insert failed"}), 500
     finally:
         if cursor:
@@ -80,9 +86,11 @@ def create_user():
                 connection.close()
             except Exception:
                 pass
+    
 
-def is_valid_user_data(data):
-    return data and 'username' in data
+@app.route('/login', methods=['GET'])
+def login_page():
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -103,8 +111,9 @@ def login():
             flash("Fel användarnamn eller lösenord", "fail")
             return render_template('login.html')
         
-        session['user'] = user['username']
         flash("Inloggad!", "success")
+        session['user_id'] = user['id']
+        session['username'] = user['username']
         return redirect(url_for('home'))
 
     except mysql.connector.Error:
@@ -115,6 +124,8 @@ def login():
             cursor.close()
         if connection:
             connection.close()
+
+
 
 # @app.route('/settings')
 # @login_required

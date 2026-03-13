@@ -5,10 +5,13 @@
 
 {% block content %}
 <div class="login-container">
-    <h2>Login</h2>
+    <h2>Sign Up</h2>
     <form method="post">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
+
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required>
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
@@ -18,7 +21,5 @@
         <p style="color: red;">Incorrect username or password</p>
         {% endif %}
     </form>
-
-    <a href="sign_up">Sign Up</a>
 </div>
 {% endblock %}
