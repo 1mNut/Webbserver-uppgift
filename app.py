@@ -42,14 +42,14 @@ def home():
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    data = request.get_json(silent=True)  # Hämta data från requesten.
+    data = request.get_json(silent=True)
     if not is_valid_user_data(data):
         return jsonify({"error": "Missing or invalid required fields (username, email, password)"}), 422
 
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-    hashed_password = generate_password_hash(password)  # Hasha lösenordet
+    hashed_password = generate_password_hash(password)
 
     connection = get_db_connection()
     if connection is None:
@@ -80,25 +80,6 @@ def create_user():
                 connection.close()
             except Exception:
                 pass
-
-
-# def is_valid_user_data(data):
-#     if not data or not isinstance(data, dict):
-#         return False
-
-#     username = data.get('username')
-#     if not isinstance(username, str) or not username.strip():
-#         return False
-
-#     if 'email' in data and data.get('email') is not None:
-#         try:
-#             email = int(data.get('email'))
-#             if email < 0:
-#                 return False
-#         except (TypeError, ValueError):
-#             return False
-
-#     return True
 
 def is_valid_user_data(data):
     return data and 'username' in data
