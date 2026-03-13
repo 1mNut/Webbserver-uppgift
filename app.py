@@ -26,25 +26,6 @@ DB_CONFIG = {
     'database': 'ourforms'
 }
 
-# Initialize database and table
-try:
-    connection = mysql.connector.connect(host='localhost', user='root', password='')
-    cursor = connection.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS ourforms")
-    cursor.execute("USE ourforms")
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) UNIQUE,
-            email VARCHAR(255),
-            password VARCHAR(255)
-        )
-    """)
-    cursor.close()
-    connection.close()
-except mysql.connector.Error as e:
-    print(f"Database initialization error: {e}")
-
 def get_db_connection():
     return mysql.connector.connect(**DB_CONFIG)
 
