@@ -26,121 +26,61 @@ DB_CONFIG = {
     'database': 'ourforms'
 }
 
-# Initialize database and table
-try:
-    connection = mysql.connector.connect(host='localhost', user='root', password='')
-    cursor = connection.cursor()
-    cursor.execute("CREATE DATABASE IF NOT EXISTS ourforms")
-    cursor.execute("USE ourforms")
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) UNIQUE,
-            email VARCHAR(255),
-            password VARCHAR(255)
-        )
-    """)
-    cursor.close()
-    connection.close()
-except mysql.connector.Error as e:
-    print(f"Database initialization error: {e}")
 
 def get_db_connection():
-    return mysql.connector.connect(**DB_CONFIG)
+    """Get a database connection"""
+    try:
+        connection = mysql.connector.connect(**DB_CONFIG)
+        return connection
+    except Error as e:
+        print(f"Error connecting to MySQL: {e}")
+        return None
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# @app.route('/users', methods=['POST'])
-# def create_user():
-#     data = request.get_json(silent=True)  # Hämta data från requesten.
-#     if not is_valid_user_data(data):
-#         return jsonify({"error": "Missing or invalid required fields (username, email, password)"}), 422
-
-#     username = data.get('username')
-#     email = data.get('email')
-#     password = data.get('password')
-#     hashed_password = generate_password_hash(password)  # Hasha lösenordet
-
-#     connection = get_db_connection()
-#     if connection is None:
-#         return jsonify({"error": "Database connection failed"}), 500
-
-#     cursor = None
-#     try:
-#         cursor = connection.cursor()
-#         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-#         cursor.execute(sql, (username, email, hashed_password))
-#         connection.commit()
-#         user_id = cursor.lastrowid
-
-#         user = {
-#             'id': user_id,
-#             'username': username,
-#             'email': email,
-#             'password': hashed_password
-#         }
-#         return jsonify(user), 201
-#     except Error as e:
-#         print(f"Error executing insert: {e}")
-#         return jsonify({"error": "Insert failed"}), 500
-#     finally:
-#         if cursor:
-#             try:
-#                 cursor.close()
-#                 connection.close()
-#             except Exception:
-#                 pass
-
 @app.route('/users', methods=['POST'])
 def create_user():
-
-    cursor = None
-    connection = None
-
-    data = request.get_json(silent=True)
-    if not data:
-        return jsonify({'error': 'Incorrect Json format'}), 400
+    data = request.get_json(silent=True)  # Hämta data från requesten.
+    if not is_valid_user_data(data):
+        return jsonify({"error": "Missing or invalid required fields (username, email, password)"}), 422
 
     username = data.get('username')
-    password = data.get('password')
     email = data.get('email')
+    password = data.get('password')
+    hashed_password = generate_password_hash(password)  # Hasha lösenordet
 
-    if not username:
-        return jsonify({'error': 'username required'}), 400
-    if not password:
-        return jsonify({'error': 'password required'}), 400
-    if not email:
-        return jsonify({'error': 'email required'}), 400
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify({"error": "Database connection failed"}), 500
 
+    cursor = None
     try:
-        connection = get_db_connection()
-        if not connection:
-            return jsonify({'error': 'database connection failed'}), 500
         cursor = connection.cursor()
-        hashed_password = generate_password_hash(password)
         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
         cursor.execute(sql, (username, email, hashed_password))
-                
         connection.commit()
         user_id = cursor.lastrowid
 
         user = {
             'id': user_id,
             'username': username,
-            'email': email
+            'email': email,
+            'password': hashed_password
         }
-        return jsonify({'message': 'user created', 'user': user}), 201
-    except IntegrityError:
-        return jsonify({'error': 'username already exists'}), 400
-    except Error:
-        return jsonify({'error': 'something went wrong'}), 500
+        return jsonify(user), 201
+    except Error as e:
+        print(f"Error executing insert: {e}")
+        return jsonify({"error": "Insert failed"}), 500
     finally:
         if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+            try:
+                cursor.close()
+                connection.close()
+            except Exception:
+                pass
+
 
 # def is_valid_user_data(data):
 #     if not data or not isinstance(data, dict):
