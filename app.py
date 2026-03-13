@@ -48,120 +48,53 @@ except mysql.connector.Error as e:
 def get_db_connection():
     return mysql.connector.connect(**DB_CONFIG)
 
+def is_valid_user_data(data):
+    return data and 'username' in data
+
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# @app.route('/users', methods=['POST'])
-# def create_user():
-#     data = request.get_json(silent=True)  # Hämta data från requesten.
-#     if not is_valid_user_data(data):
-#         return jsonify({"error": "Missing or invalid required fields (username, email, password)"}), 422
-
-#     username = data.get('username')
-#     email = data.get('email')
-#     password = data.get('password')
-#     hashed_password = generate_password_hash(password)  # Hasha lösenordet
-
-#     connection = get_db_connection()
-#     if connection is None:
-#         return jsonify({"error": "Database connection failed"}), 500
-
-#     cursor = None
-#     try:
-#         cursor = connection.cursor()
-#         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-#         cursor.execute(sql, (username, email, hashed_password))
-#         connection.commit()
-#         user_id = cursor.lastrowid
-
-#         user = {
-#             'id': user_id,
-#             'username': username,
-#             'email': email,
-#             'password': hashed_password
-#         }
-#         return jsonify(user), 201
-#     except Error as e:
-#         print(f"Error executing insert: {e}")
-#         return jsonify({"error": "Insert failed"}), 500
-#     finally:
-#         if cursor:
-#             try:
-#                 cursor.close()
-#                 connection.close()
-#             except Exception:
-#                 pass
-
 @app.route('/users', methods=['POST'])
 def create_user():
-
-    cursor = None
-    connection = None
-
     data = request.get_json(silent=True)
-    if not data:
-        return jsonify({'error': 'Incorrect Json format'}), 400
+    if not is_valid_user_data(data):
+        return jsonify({"error": "Missing or invalid required fields (username, email, password)"}), 422
 
     username = data.get('username')
-    password = data.get('password')
     email = data.get('email')
+    password = data.get('password')
+    hashed_password = generate_password_hash(password)
 
-    if not username:
-        return jsonify({'error': 'username required'}), 400
-    if not password:
-        return jsonify({'error': 'password required'}), 400
-    if not email:
-        return jsonify({'error': 'email required'}), 400
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify({"error": "Database connection failed"}), 500
 
+    cursor = None
     try:
-        connection = get_db_connection()
-        if not connection:
-            return jsonify({'error': 'database connection failed'}), 500
         cursor = connection.cursor()
-        hashed_password = generate_password_hash(password)
         sql = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
         cursor.execute(sql, (username, email, hashed_password))
-                
         connection.commit()
         user_id = cursor.lastrowid
 
         user = {
             'id': user_id,
             'username': username,
-            'email': email
+            'email': email,
+            'password': hashed_password
         }
-        return jsonify({'message': 'user created', 'user': user}), 201
-    except IntegrityError:
-        return jsonify({'error': 'username already exists'}), 400
-    except Error:
-        return jsonify({'error': 'something went wrong'}), 500
+        return jsonify(user), 201
+    except Error as e:
+        print(f"Error executing insert: {e}")
+        return jsonify({"error": "Insert failed"}), 500
     finally:
         if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
-
-# def is_valid_user_data(data):
-#     if not data or not isinstance(data, dict):
-#         return False
-
-#     username = data.get('username')
-#     if not isinstance(username, str) or not username.strip():
-#         return False
-
-#     if 'email' in data and data.get('email') is not None:
-#         try:
-#             email = int(data.get('email'))
-#             if email < 0:
-#                 return False
-#         except (TypeError, ValueError):
-#             return False
-
-#     return True
-
-def is_valid_user_data(data):
-    return data and 'username' in data
+            try:
+                cursor.close()
+                connection.close()
+            except Exception:
+                pass
 
 @app.route('/login', methods=['POST'])
 def login():
