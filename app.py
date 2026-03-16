@@ -92,6 +92,12 @@ def create_user():
 def login_page():
     return render_template('login.html')
 
+@app.route('/logout', methods=['GET'])
+def logout():
+    session.clear()
+    flash("Utloggad!", "success")
+    return redirect(url_for('login_page'))
+
 @app.route('/login', methods=['POST'])
 def login():
 

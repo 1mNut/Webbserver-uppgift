@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
 {% block menu %}
-<button>Profile</button>
-<button>Home</button>
-<button>Settings</button>
+    <a href=""  class="linkbutton">Profile</a>
+    <a href="/" class="linkbutton">Home</a>
+    <a href=""  class="linkbutton">Settings</a>
 {% endblock %}
 
 {% block content %}
+    <p>Du är nu inloggad.</p>
+    
+    <a href="/logout">Logga ut</a>
 {% endblock %}
