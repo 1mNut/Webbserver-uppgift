@@ -8,6 +8,7 @@ from mysql.connector import Error, IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
+from forum import forum_bp  # Importera blueprinten
 
 
 
@@ -16,6 +17,9 @@ jwt = JWTManager(app)
 socketio = SocketIO(app)
 
 app.secret_key = 'SUPER_SECRET_IMPOSSIBLE_TO_CRACK_KEY'
+
+# Registrera blueprinten
+app.register_blueprint(forum_bp)
 
 
 
@@ -133,10 +137,11 @@ def login():
 
 
 
-# @app.route('/settings')
-# @login_required
-# def settings():
-#     return render_template('settings.html')
+
+@app.route('/profile')
+@login_required
+def settings():
+    return render_template('profile.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

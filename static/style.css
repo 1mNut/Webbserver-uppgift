@@ -6,6 +6,10 @@ body {
     align-items: center;
 }
 
+* {
+    font-family: Arial;
+}
+
 header {
     background: rgba(180, 180, 180, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.7);
@@ -31,18 +35,37 @@ button {
     transition: 0.3s all ease;
     border-radius: 10px;
     padding: 10px;
-    margin: 0 30px;
+    margin: 5px 30px;
     text-align: center;
     cursor: pointer;
     color: white;
 }
-.linkbutton{
+.linkbutton {
     background: rgba(180, 180, 180, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.7);
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     transition: 0.3s all ease;
     border-radius: 10px;
+    padding: 10px;
+    margin: 5px 30px;
+    text-align: center;
+    cursor: pointer;
+    color: white; 
+    text-decoration: none;
+}
+
+.linkbutton:hover {
+    transform: scale(1.05);
+}  
+
+.profile_icon {
+    background: rgba(180, 180, 180, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    transition: 0.3s all ease;
+    border-radius: 100px;
     padding: 10px;
     margin: 0 30px;
     text-align: center;
@@ -51,12 +74,42 @@ button {
     text-decoration: none;
 }
 
-.linkbutton:hover {
-    transform: scale(1.1);
-}   
+.wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown_menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 160px;
+    background: rgba(180, 180, 180, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.25s ease, opacity 0.25s ease;
+}
+
+.dropdown_menu a {
+    display: block;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+}
+
+.dropdown_menu.open {
+  max-height: 300px;
+  opacity: 1;
+  visibility: visible;
+}
 
 button:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 #content {
@@ -80,9 +133,67 @@ button:hover {
 }
 
 .flash.success {
-  background-color: #4CAF50; /* grön */
+  background-color: #4CAF50; 
 }
 
 .flash.fail {
-  background-color: #f44336; /* röd */
+  background-color: #f44336;
+}
+
+.login-container, .create-topic-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.login-container form, .create-topic-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container label, .create-topic-container label {
+    margin-top: 10px;
+    color: white;
+}
+
+.login-container input, .create-topic-container input, .create-topic-container textarea {
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.create-topic-container textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.topics-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.topic {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.topic h3 {
+    margin-top: 0;
+    color: white;
+}
+
+.topic p {
+    color: white;
+}
+
+.topic small {
+    color: #ccc;
 }

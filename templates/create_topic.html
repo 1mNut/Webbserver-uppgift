@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block menu %}
+    <a href="/" class="linkbutton">Home</a>
+{% endblock %}
+
+{% block content %}
+<div class="create-topic-container">
+    <h2>Skapa Ny Tråd</h2>
+    <form method="post">
+        <label for="header">Rubrik:</label>
+        <input type="text" id="header" name="header" required maxlength="50">
+
+        <label for="description">Beskrivning:</label>
+        <textarea id="description" name="description" required maxlength="200"></textarea>
+
+        <button type="submit">Skapa Tråd</button>
+    </form>
+</div>
+{% endblock %}
