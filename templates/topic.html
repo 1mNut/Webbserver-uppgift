@@ -7,9 +7,17 @@
     <p>{{ topic.description }}</p>
     <small>Av: {{ topic.username }} - {{ topic.date }}</small>
 </div>
-<div class="comment">
+<div class="comment-container">
+    <h3>Kommentarer</h3>
+    {% for comment in comments %}
+    <div class="comment">
+        <p>{{ comment.content }}</p>
+        <small>Av: {{ comment.username }} - {{ comment.date }}</small>
+    </div>
+    {% endfor %}
+<form class="comment" method="post">
     <label for="comment">Skapa Kommentar</label>
-    <input type="text" id="comment" name="content" required>
+    <input type="text" id="comment" name="comment" required>
     <button type="submit" class="linkbutton">></button>
-</div>
+</form>
 {% endblock %}

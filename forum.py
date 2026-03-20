@@ -131,10 +131,10 @@ def add_comment(topic_id):
         cursor.execute(sql, (topic_id, user_id, content, date))
         connection.commit()
         flash("Kommentar tillagd!", "success")
-        return redirect(url_for('view_topic', topic_id=topic_id))
+        return redirect(url_for('forum.view_topic', topic_id=topic_id))
     except Error as e:
         flash(f"Error: {e}", "fail")
-        return redirect(url_for('view_topic', topic_id=topic_id))
+        return redirect(url_for('forum.view_topic', topic_id=topic_id))
     finally:
         if cursor:
             cursor.close()
