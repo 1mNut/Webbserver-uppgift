@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="/topics" class="linkbutton">Tillbaka till Trådar</a>
+<div class="topic-container">
+    <h2>{{ topic.header }}</h2>
+    <p>{{ topic.description }}</p>
+    <small>Av: {{ topic.username }} - {{ topic.date }}</small>
+</div>
+<div class="comment">
+    <label for="comment">Skapa Kommentar</label>
+    <input type="text" id="comment" name="content" required>
+    <button type="submit" class="linkbutton">></button>
+</div>
+{% endblock %}

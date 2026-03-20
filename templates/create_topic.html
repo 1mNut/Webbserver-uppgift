@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 
-{% block menu %}
-    <a href="/" class="linkbutton">Home</a>
-{% endblock %}
-
 {% block content %}
 <div class="create-topic-container">
     <h2>Skapa Ny Tråd</h2>
@@ -14,7 +10,7 @@
         <label for="description">Beskrivning:</label>
         <textarea id="description" name="description" required maxlength="200"></textarea>
 
-        <button type="submit">Skapa Tråd</button>
+        <button type="submit" class="linkbutton">Skapa Tråd</button>
     </form>
 </div>
 {% endblock %}

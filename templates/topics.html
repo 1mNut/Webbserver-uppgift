@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="/create" class="linkbutton">Skapa Tråd</a>
+<div class="topics-container">
+    <h2>Forum Trådar</h2>
+    {% for topic in topics %}
+    <div class="topic">
+        <h3><a href="/topic/{{ topic.id }}">{{ topic.header }}</a></h3>
+        <p>{{ topic.description }}</p>
+        <small>Av: {{ topic.username }} - {{ topic.date }}</small>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

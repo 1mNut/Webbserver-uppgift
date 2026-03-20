@@ -11,6 +11,14 @@
 <body>
     <header>
     {% block menu %}
+        <div class="wrapper">
+            <button id="profile-button" class="profile_icon linkbutton">👤</button>
+            <div id="profile-dropdown" class="dropdown_menu">
+                <a href="/profile" class="linkbutton">Profil</a>
+                <a href="/logout" class="linkbutton">Logga ut</a>
+            </div>
+        </div>
+        <a href="/" class="linkbutton">Hem</a>
     {% endblock %}
     </header>
 

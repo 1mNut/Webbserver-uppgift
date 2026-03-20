@@ -82,3 +82,61 @@ def list_topics():
             cursor.close()
         if connection:
             connection.close()
+
+@forum_bp.route('/topic/<int:topic_id>', methods=['GET'])
+def view_topic(topic_id): 
+    connection = get_db_connection()
+    if connection is None:
+        return "Database error", 500
+    
+    cursor = None
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT topics.*, users.username FROM topics JOIN users ON topics.user_id = users.id WHERE topics.id = %s", (topic_id,))
+        topic = cursor.fetchone()
+        if topic is None:
+            return jsonify({"error": "Topic not found"}), 404
+        
+        # Hämta kommentarer för tråden
+        cursor.execute("SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE comments.topic_id = %s ORDER BY date ASC", (topic_id,))
+        comments = cursor.fetchall()
+        
+        return render_template('topic.html', topic=topic, comments=comments)
+    except Error as e:
+        return f"Error: {e}", 500
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+@forum_bp.route('/topic/<int:topic_id>', methods=['POST'])
+def add_comment(topic_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    
+    content = request.form['comment']
+    user_id = session['user_id']
+    date = datetime.now().date()
+    
+    connection = get_db_connection()
+    if connection is None:
+        flash("Database connection failed", "fail")
+        return redirect(url_for('home'))
+    
+    cursor = None
+    try:
+        cursor = connection.cursor()
+        sql = "INSERT INTO comments (topic_id, user_id, content, date) VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, (topic_id, user_id, content, date))
+        connection.commit()
+        flash("Kommentar tillagd!", "success")
+        return redirect(url_for('view_topic', topic_id=topic_id))
+    except Error as e:
+        flash(f"Error: {e}", "fail")
+        return redirect(url_for('view_topic', topic_id=topic_id))
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
