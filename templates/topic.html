@@ -11,9 +11,15 @@
     <h3>Kommentarer</h3>
     {% for comment in comments %}
     <div class="comment">
-        <p>{{ comment.content }}</p>
-        <small>Av: {{ comment.username }} - {{ comment.date }}</small>
+    <p>{{ comment.content }}</p>
+    <small>Av: {{ comment.username }} - {{ comment.date }}</small>
+    <div>
+        <span>Likes: {{ comment.like_count }}</span>
+        <form method="post" action="/comment/{{ comment.id }}/like" style="display:inline;">
+            <button type="submit" class="linkbutton">Gilla</button>
+        </form>
     </div>
+</div>
     {% endfor %}
 <form class="comment" method="post">
     <label for="comment">Skapa Kommentar</label>

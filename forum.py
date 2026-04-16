@@ -98,7 +98,15 @@ def view_topic(topic_id):
             return jsonify({"error": "Topic not found"}), 404
         
         # Hämta kommentarer för tråden
-        cursor.execute("SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE comments.topic_id = %s ORDER BY date ASC", (topic_id,))
+        cursor.execute("""
+            SELECT comments.*, users.username, COUNT(likes.id) AS like_count
+            FROM comments
+            JOIN users ON comments.user_id = users.id
+            LEFT JOIN likes ON likes.comment_id = comments.id
+            WHERE comments.topic_id = %s
+            GROUP BY comments.id
+            ORDER BY comments.date ASC
+        """, (topic_id,))
         comments = cursor.fetchall()
         
         return render_template('topic.html', topic=topic, comments=comments)
@@ -135,6 +143,33 @@ def add_comment(topic_id):
     except Error as e:
         flash(f"Error: {e}", "fail")
         return redirect(url_for('forum.view_topic', topic_id=topic_id))
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+@forum_bp.route('/comment/<int:comment_id>/like', methods=['POST'])
+def like_comment(comment_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
+    user_id = session['user_id']
+    connection = get_db_connection()
+    if connection is None:
+        flash("Database connection failed", "fail")
+        return redirect(url_for('home'))
+
+    cursor = None
+    try:
+        cursor = connection.cursor()
+        sql = "INSERT IGNORE INTO likes (user_id, comment_id) VALUES (%s, %s)"
+        cursor.execute(sql, (user_id, comment_id))
+        connection.commit()
+        return redirect(request.referrer or url_for('home'))
+    except Error as e:
+        flash(f"Error: {e}", "fail")
+        return redirect(request.referrer or url_for('home'))
     finally:
         if cursor:
             cursor.close()
