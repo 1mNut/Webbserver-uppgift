@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Värd: 127.0.0.1
--- Tid vid skapande: 24 apr 2026 kl 12:39
+-- Tid vid skapande: 24 apr 2026 kl 14:14
 -- Serverversion: 10.4.32-MariaDB
 -- PHP-version: 8.2.12
 
@@ -40,7 +40,10 @@ CREATE TABLE `comments` (
 --
 
 INSERT INTO `comments` (`id`, `topic_id`, `user_id`, `content`, `date`) VALUES
-(5, 2, 1, 'salhaosf', '2026-04-16 00:00:00');
+(5, 2, 1, 'salhaosf', '2026-04-16 00:00:00'),
+(6, 2, 3, 'tjena', '2026-04-24 00:00:00'),
+(7, 2, 3, 'awdwa', '2026-04-24 00:00:00'),
+(8, 3, 3, 'Tjabba', '2026-04-24 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -59,7 +62,11 @@ CREATE TABLE `likes` (
 --
 
 INSERT INTO `likes` (`id`, `user_id`, `comment_id`) VALUES
-(1, 1, 5);
+(1, 1, 5),
+(5, 3, 5),
+(36, 3, 6),
+(37, 3, 7),
+(32, 3, 8);
 
 -- --------------------------------------------------------
 
@@ -80,7 +87,8 @@ CREATE TABLE `topics` (
 --
 
 INSERT INTO `topics` (`id`, `user_id`, `header`, `description`, `date`) VALUES
-(2, 1, 'Bananer är bästa frukten!', 'you heard me', '2026-04-16');
+(2, 1, 'Bananer är bästa frukten!', 'you heard me', '2026-04-16'),
+(3, 3, 'wdaaw0', 'okdwaoådwak', '2026-04-24');
 
 -- --------------------------------------------------------
 
@@ -101,7 +109,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`) VALUES
 (1, 'Melker', 'scrypt:32768:8:1$QtwvyQeLMknqTG7V$bf4c2b30cbb14da38dac27c9b3c99ada17cf2e47bf65bf891ae0e15bee573b0bf247a498df9b7f7620d7a4c6f7c6b0fa28f0059fe7fa6bb0a0759723540150cb', 'melker.skola@gmail.com'),
-(2, 'Sebbe', 'scrypt:32768:8:1$bhpbrskXfTL79PKP$fa3f6e7ad96f8c28ea75d8cac2601de390ea876a5fe57b3f0542a68c44b1c2fba66da68951b83288be17f546ec3b493f1595a7819ea577d3696d74eda93e3366', 'sebastian@skola.taby');
+(2, 'Sebbe', 'scrypt:32768:8:1$bhpbrskXfTL79PKP$fa3f6e7ad96f8c28ea75d8cac2601de390ea876a5fe57b3f0542a68c44b1c2fba66da68951b83288be17f546ec3b493f1595a7819ea577d3696d74eda93e3366', 'sebastian@skola.taby'),
+(3, 'Sebastian', 'scrypt:32768:8:1$JUvqzTjboXCo8vUr$5fb2e638904c34441a112f3db3a652ecbae0595ac9acc1261be217e6d7706f3eb1de3c7eacdabc7e74e11a096b8cf4ab7904348b9bbdf6807d8ea1ed3c63c048', 'sebastian.nilsson@skola.taby.se');
 
 --
 -- Index för dumpade tabeller
@@ -118,7 +127,7 @@ ALTER TABLE `comments`
 --
 ALTER TABLE `likes`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `unique_like` (`user_id`,`comment_id`);
 
 --
 -- Index för tabell `topics`
@@ -141,25 +150,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT för tabell `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT för tabell `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT för tabell `topics`
 --
 ALTER TABLE `topics`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT för tabell `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
