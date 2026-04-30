@@ -184,3 +184,22 @@ button:hover {
 .topic small {
     color: #ccc;
 }
+
+.line {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.7);
+    margin: 20px 0;
+}
+.padding {
+    padding: 10px;
+}
+
+.likebutton:hover {
+    background-color: rgba(60, 255, 0, 0.2);
+    transform: scale(1.1);
+}
+
+.likebutton:active {
+    background-color: rgba(115, 255, 0, 0.877);
+    transform: scale(0.9);
+}

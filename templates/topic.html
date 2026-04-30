@@ -1,24 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="/topics" class="linkbutton">Tillbaka till Trådar</a>
 <div class="topic-container">
+    <div class="padding"></div>
+    <a href="/topics" class="linkbutton">Tillbaka till Trådar</a>
     <h2>{{ topic.header }}</h2>
     <p>{{ topic.description }}</p>
     <small>Av: {{ topic.username }} - {{ topic.date }}</small>
 </div>
 <div class="comment-container">
-    <h3>Kommentarer</h3>
+    <div class="line"></div>
+    <h3>Kommentarer:</h3>
+    
     {% for comment in comments %}
     <div class="comment">
     <p>{{ comment.content }}</p>
-    <small>Av: {{ comment.username }} - {{ comment.date }}</small>
     <div>
-        <span>Likes: {{ comment.like_count }}</span>
+         <small>{{ comment.username }} - {{ comment.date }}</small>
+        <span></span><small>Likes: {{ comment.like_count }}</span></small>
         <form method="post" action="/comment/{{ comment.id }}/like" style="display:inline;">
-            <button type="submit" class="linkbutton">Gilla</button>
+            <button type="submit" class="linkbutton likebutton">Gilla</button>
         </form>
     </div>
+    <div class="line"></div>
 </div>
     {% endfor %}
 <form class="comment" method="post">
