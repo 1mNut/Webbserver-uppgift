@@ -19,7 +19,6 @@ DB_CONFIG = {
 }
 
 def get_db_connection():
-    """Get a database connection"""
     try:
         connection = mysql.connector.connect(**DB_CONFIG)
         return connection
@@ -151,25 +150,42 @@ def add_comment(topic_id):
 
 @forum_bp.route('/comment/<int:comment_id>/like', methods=['POST'])
 def like_comment(comment_id):
+
     if 'user_id' not in session:
-        return redirect(url_for('login_page'))
+        return jsonify({"success": False, "error": "not_logged_in"}), 401
 
     user_id = session['user_id']
+
     connection = get_db_connection()
     if connection is None:
-        flash("Database connection failed", "fail")
-        return redirect(url_for('home'))
+        return jsonify({"success": False, "error": "db_error"}), 500
 
     cursor = None
     try:
         cursor = connection.cursor()
-        sql = "INSERT IGNORE INTO likes (user_id, comment_id) VALUES (%s, %s)"
-        cursor.execute(sql, (user_id, comment_id))
+
+        cursor.execute(
+            "INSERT IGNORE INTO likes (user_id, comment_id) VALUES (%s, %s)",
+            (user_id, comment_id)
+        )
+
         connection.commit()
-        return redirect(request.referrer or url_for('home'))
+
+        cursor.execute(
+            "SELECT COUNT(*) FROM likes WHERE comment_id = %s",
+            (comment_id,)
+        )
+
+        like_count = cursor.fetchone()[0]
+
+        return jsonify({
+            "success": True,
+            "likes": like_count
+        })
+
     except Error as e:
-        flash(f"Error: {e}", "fail")
-        return redirect(request.referrer or url_for('home'))
+        return jsonify({"success": False, "error": str(e)}), 500
+
     finally:
         if cursor:
             cursor.close()

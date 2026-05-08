@@ -17,10 +17,13 @@
     <p>{{ comment.content }}</p>
     <div>
          <small>{{ comment.username }} - {{ comment.date }}</small>
-        <span></span><small>Likes: {{ comment.like_count }}</span></small>
-        <form method="post" action="/comment/{{ comment.id }}/like" style="display:inline;">
-            <button type="submit" class="linkbutton likebutton">Gilla</button>
-        </form>
+        <span id="like-count-{{ comment.id }}">
+        Likes: {{ comment.like_count }}
+        </span>
+        <button class="linkbutton like-button"
+                data-comment-id="{{ comment.id }}">
+            Gilla
+        </button>
     </div>
     <div class="line"></div>
 </div>

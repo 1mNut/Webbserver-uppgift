@@ -42,6 +42,10 @@ header {
     text-decoration: none;
 }
 
+.linkbutton.green {
+    background: green !important;
+}
+
 .linkbutton:hover {
     transform: scale(1.05);
 }  
@@ -202,4 +206,8 @@ button:hover {
 .likebutton:active {
     background-color: rgba(115, 255, 0, 0.877);
     transform: scale(0.9);
+}
+
+.green {
+    background-color: green !important;
 }
