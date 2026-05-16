@@ -1,16 +1,11 @@
-from functools import *
 from flask import Blueprint, request, jsonify, session, redirect, url_for, render_template, flash
 import mysql.connector
 from mysql.connector import Error
-from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
-
-# SELECT * from topics where header like "%hej%"
 
 # Skapa en blueprint för forumet
 forum_bp = Blueprint('forum', __name__)
 
-# Använd samma DB_CONFIG som i app.py (importera från app.py eller definiera här)
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
@@ -62,6 +57,43 @@ def create_topic():
         if connection:
             connection.close()
 
+@forum_bp.route('/topic/<int:topic_id>/delete', methods=['POST'])
+def delete_topic(topic_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    
+    user_id = session['user_id']
+    is_admin = session.get('is_admin', 0)
+    
+    connection = get_db_connection()
+    if connection is None:
+        return "Database error", 500
+    
+    cursor = None
+    try:
+        cursor = connection.cursor(dictionary=True)
+        
+        cursor.execute("SELECT user_id FROM topics WHERE id = %s", (topic_id,))
+        topic = cursor.fetchone()
+        
+        if not topic:
+            return redirect(url_for('forum.list_topics'))
+            
+        if is_admin == 1 or topic['user_id'] == user_id:
+            cursor.execute("DELETE FROM topics WHERE id = %s", (topic_id,))
+            connection.commit()
+            return redirect(url_for('forum.list_topics'))
+        else:
+            return redirect(url_for('forum.view_topic', topic_id=topic_id))
+            
+    except Error as e:
+        return f"Error: {e}", 500
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
 @forum_bp.route('/topics', methods=['GET'])
 def list_topics():
     connection = get_db_connection()
@@ -96,19 +128,21 @@ def view_topic(topic_id):
         if topic is None:
             return jsonify({"error": "Topic not found"}), 404
         
+        current_user = session.get('user_id', 0)
+
         # Hämta kommentarer för tråden
         cursor.execute("""
-            SELECT comments.*, users.username, COUNT(likes.id) AS like_count
+            SELECT comments.*, users.username, COUNT(likes.id) AS like_count, MAX(CASE WHEN likes.user_id = %s THEN 1 ELSE 0 END) AS has_liked
             FROM comments
             JOIN users ON comments.user_id = users.id
             LEFT JOIN likes ON likes.comment_id = comments.id
             WHERE comments.topic_id = %s
             GROUP BY comments.id
             ORDER BY comments.date ASC
-        """, (topic_id,))
+        """, (current_user, topic_id))
         comments = cursor.fetchall()
         
-        return render_template('topic.html', topic=topic, comments=comments)
+        return render_template('topic.html', topic=topic, comments=comments, current_user=session.get('user_id'), is_admin=session.get('is_admin', 0))
     except Error as e:
         return f"Error: {e}", 500
     finally:

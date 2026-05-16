@@ -14,7 +14,9 @@
         <div class="wrapper">
             <button id="profile-button" class="profile_icon linkbutton">👤</button>
             <div id="profile-dropdown" class="dropdown_menu">
-                <a href="/profile" class="linkbutton">Profil</a>
+                {% if session.username %}
+                    <span class="user-greeting">Inloggad som: <b>{{ session.username }}</b></span>
+                {% endif %}
                 <a href="/logout" class="linkbutton">Logga ut</a>
             </div>
         </div>

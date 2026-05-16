@@ -1,27 +1,15 @@
-from functools import *
-from flask_socketio import *
-import random as rand
-from flask import Flask, request, jsonify, session, redirect, url_for, render_template, get_flashed_messages, flash
-from flask_cors import CORS
+from functools import wraps
+from flask import Flask, request, jsonify, session, redirect, url_for, render_template, flash
 import mysql.connector
-from mysql.connector import Error, IntegrityError
+from mysql.connector import Error
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from datetime import timedelta
-from forum import forum_bp  # Importera blueprinten
+
 
 
 
 app = Flask(__name__)
-jwt = JWTManager(app)
-socketio = SocketIO(app)
 
 app.secret_key = 'SUPER_SECRET_IMPOSSIBLE_TO_CRACK_KEY'
-
-# Registrera blueprinten
-app.register_blueprint(forum_bp)
-
-
 
 DB_CONFIG = {
     'host': 'localhost',
@@ -30,10 +18,7 @@ DB_CONFIG = {
     'database': 'ourforms'
 }
 
-
-
 def get_db_connection():
-    """Get a database connection"""
     try:
         connection = mysql.connector.connect(**DB_CONFIG)
         return connection
@@ -49,9 +34,6 @@ def login_required(f):
             return redirect(url_for('login_page'))
         return f(*args, **kwargs)
     return decorated_function
-
-def is_valid_user_data(data):
-    return data and 'username' in data
 
 @app.route('/')
 @login_required
@@ -124,9 +106,10 @@ def login():
         flash("Inloggad!", "success")
         session['user_id'] = user['id']
         session['username'] = user['username']
+        session['is_admin'] = user['is_admin']
         return redirect(url_for('home'))
 
-    except mysql.connector.Error:
+    except Error:
         return render_template('login.html', error=True)
 
     finally:
@@ -135,13 +118,9 @@ def login():
         if connection:
             connection.close()
 
-
-
-
-@app.route('/profile')
-@login_required
-def settings():
-    return render_template('profile.html')
+# Registrera blueprinten
+from forum import forum_bp  # Importera blueprinten
+app.register_blueprint(forum_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)

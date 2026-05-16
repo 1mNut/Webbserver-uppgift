@@ -9,8 +9,7 @@ document.addEventListener("click", async (e) => {
     const data = await response.json();
 
     if (data.success) {
-      document.getElementById(`like-count-${commentId}`)
-      e.target.classList.add("green")
+      e.target.classList.add("green");
       const element = document.getElementById(`like-count-${commentId}`);
       element.textContent = `Likes: ${data.likes}`;
     }

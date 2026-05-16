@@ -7,6 +7,11 @@
     <h2>{{ topic.header }}</h2>
     <p>{{ topic.description }}</p>
     <small>Av: {{ topic.username }} - {{ topic.date }}</small>
+    {% if is_admin == 1 or topic.user_id == current_user %}
+        <form action="{{ url_for('forum.delete_topic', topic_id=topic.id) }}" method="post" style="margin-top: 10px;" onsubmit="return confirm('Är du säker på att du vill radera hela tråden och alla kommentarer?');">
+            <button type="submit" class="linkbutton" style="background-color: #ff4d4d; color: white;">Radera Tråd</button>
+        </form>
+    {% endif %}
 </div>
 <div class="comment-container">
     <div class="line"></div>
@@ -20,13 +25,15 @@
         <span id="like-count-{{ comment.id }}">
         Likes: {{ comment.like_count }}
         </span>
-        <button class="linkbutton like-button"
+        
+        <!-- Här kollar vi om användaren har gillat och lägger till klassen 'green' -->
+        <button class="linkbutton like-button {% if comment.has_liked == 1 %}green{% endif %}"
                 data-comment-id="{{ comment.id }}">
             Gilla
         </button>
     </div>
     <div class="line"></div>
-</div>
+    </div>
     {% endfor %}
 <form class="comment" method="post">
     <label for="comment">Skapa Kommentar</label>
