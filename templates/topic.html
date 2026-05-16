@@ -26,7 +26,6 @@
         Likes: {{ comment.like_count }}
         </span>
         
-        <!-- Här kollar vi om användaren har gillat och lägger till klassen 'green' -->
         <button class="linkbutton like-button {% if comment.has_liked == 1 %}green{% endif %}"
                 data-comment-id="{{ comment.id }}">
             Gilla

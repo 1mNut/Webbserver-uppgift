@@ -3,12 +3,12 @@ from flask import Flask, request, jsonify, session, redirect, url_for, render_te
 import mysql.connector
 from mysql.connector import Error
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from forum import forum_bp  # Importera blueprinten
 
 
 
 app = Flask(__name__)
-
+app.register_blueprint(forum_bp)
 app.secret_key = 'SUPER_SECRET_IMPOSSIBLE_TO_CRACK_KEY'
 
 DB_CONFIG = {
@@ -117,10 +117,6 @@ def login():
             cursor.close()
         if connection:
             connection.close()
-
-# Registrera blueprinten
-from forum import forum_bp  # Importera blueprinten
-app.register_blueprint(forum_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)
